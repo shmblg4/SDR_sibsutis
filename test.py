@@ -1,64 +1,44 @@
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy import signal
-from scipy.signal import max_len_seq
+import matplotlib.pyplot as plt
 
-fs = 10e6
-rs = 10e5
-ns = fs // rs
- 
 
-data = max_len_seq(8)[0] 
-data = np.concatenate((data,np.zeros(1)))
- 
- 
-x_ = np.array([1,1,1,-1,-1,-1,1,-1,-1,1,-1])
-b7 = np.array([1,-1,1,1,1,-1,1])
-ts1 = np.array([0,0,1,0,0,1,0,1,1,1,0,0,0,0,1,0,0,0,1,0,0,1,0,1,1,1])
-ts2 = [0,0,1,0,1,1,0,1,1,1,0,1,1,1,1,0,0,0,1,0,1,1,0,1,1,1]
-ts3 = [1,0,1,0,0,1,1,1,1,1,0,1,1,0,0,0,1,0,1,0,0,1,1,1,1,1]
-ts4 = [1,1,1,0,1,1,1,1,0,0,0,1,0,0,1,0,1,1,1,0,1,1,1,1,0,0]
-m = 2*data-1
-#ts1t=2*ts1-1
-ts1t = b7
- 
+with open('buffer_out.txt', 'r') as file:
+    data = file.readlines()
 
-b = np.ones(int(ns))
- 
-#qpsk
 
- 
-x=np.reshape(m,(2,128))
-xi=x[0,:]
-xq=x[1,:]
-x_bb=(xi+1j*xq)/np.sqrt(2)
-plt.figure(1)
-plt.scatter(x_bb.real,x_bb.imag)
+complex_numbers = []
+for line in data:
+    x, y = map(float, line.strip().split(','))
+    x = x / 2 ** 11
+    y = y / 2 ** 11
+    complex_numbers.append(complex(x, y))
+
+
+real_parts = [z.real for z in complex_numbers]
+imaginary_parts = [z.imag for z in complex_numbers]
+
+
+oner = np.ones(10)
+real_parts = np.convolve(real_parts, oner)
+imaginary_parts = np.convolve(imaginary_parts, oner)
+
+plt.figure(figsize=(10, 10))
+plt.subplot(2,1,1)
+plt.scatter(real_parts, imaginary_parts, marker='.')
+
+
+plt.title('График комплексных чисел')
+plt.xlabel('Действительная часть')
+plt.ylabel('Мнимая часть')
+plt.axhline(0, color='black',linewidth=0.5, ls='--')
+plt.axvline(0, color='black',linewidth=0.5, ls='--')
+plt.grid()
+# plt.xlim(-1000, 1000)
+# plt.ylim(-1000, 10000)
+plt.subplot(2,1,2)
+plt.plot(real_parts, label = "Реальная часть")
+plt.plot(imaginary_parts, label = "Мнимая часть")
+plt.legend()
+
+
 plt.show()
-
-
-file = open("buffer.h", "w")
-file.write("double arr_real[] = {")
-index = 0
-for elem in x_bb:
-    str_elem = f"{elem.real}, "
-    file.write(str_elem + "\n")
-    index += 1
-print(index)
-file.write("};")
-file.write("\ndouble arr_imag[] = {")
-for elem in x_bb:
-    str_elem = f"{elem.imag}, "
-    file.write(str_elem + "\n")
-file.write("};")
-file.close()
-
- 
- 
-# xiq=2**14*x_bb
- 
-# n_frame= len(xiq)
-# xrec1=sdr.rx()
-# xrec = xrec1/np.mean(xrec1**2)
-# plt.figure(2)
-# plt.scatter(xrec.real,xrec.imag)
