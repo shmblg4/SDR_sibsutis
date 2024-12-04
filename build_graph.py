@@ -2,23 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-with open('./rx_data.txt', 'r') as file:
+with open('./buffer_out.txt', 'r') as file:
     data = file.readlines()
 
 
 complex_numbers = []
 for line in data:
     x, y = map(float, line.strip().split(','))
-    x= x/(2**11)
-    y= y/(2**11)
+    x= x/(2**8)
+    y= y/(2**8)
     complex_numbers.append(complex(x, y))
 
 
-flt = np.ones(10)
-result = np.convolve(complex_numbers, flt, mode='full')
-real_parts = [z.real for z in result]
-imaginary_parts = [z.imag for z in result]
+real_parts = [z.real for z in complex_numbers]
+imaginary_parts = [z.imag for z in complex_numbers]
 
+# oner = np.ones(10)
+# real_parts = np.convolve(real_parts, oner)
+# imaginary_parts = np.convolve(imaginary_parts, oner)
 
 plt.figure(figsize=(10, 10))
 plt.subplot(2,1,1)
@@ -42,7 +43,6 @@ plt.subplot(2,1,2)
 plt.plot(real_parts)
 plt.plot(imaginary_parts)
 # plt.xlim(10000, 10500)
-plt.ylim(-1, 1)
 
 
 

@@ -116,7 +116,7 @@ int main()
     txcfg.rfport = "A";     // port A (select for rf freq.)
 
     // Initialize IIO context
-    ctx = iio_create_context(NULL, "ip:192.168.5.1");
+    ctx = iio_create_context(NULL, "ip:192.168.2.1");
     if (!ctx)
     {
         std::cerr << "Unable to create IIO context addr: " << "ip:192.168.2.1" << std::endl;
